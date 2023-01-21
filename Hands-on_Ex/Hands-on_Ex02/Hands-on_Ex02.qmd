@@ -1,0 +1,4 @@
+---
+title: "Hands-on Exercise 2: Creating Elegant Graphics with ggplot2"
+author: "Siddharth Singh"
+---
