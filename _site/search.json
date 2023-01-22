@@ -19,5 +19,96 @@
     "title": "ISSS608-VAA",
     "section": "",
     "text": "Welcome to ISSS608 Visual Analytics and Applications. In this website, you will find my coursework prepared for this course."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html",
+    "title": "Take-Home_Ex01",
+    "section": "",
+    "text": "The task is to use Age-Sex pyramid to create analytical visualisation to reveal the structure of population by gender and age group.\nThe data used in this task is ’Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2022’, which can be found on Department of Statistics, Singapore website. Navigate to ‘Find Data > Search by Theme > Population > Geographic Distribution > Latest Data’ under Population Trends or use the linkhttps://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data to directly go to the page.\nThis data is used to find the demographic structure of Singapore at planning level by using age-sex pyramid method in trellis display style. Out of all the available planning level areas in the data set, I have decided to choose these 9 areas for trellis style display - ‘Ang Mo Kio’, ‘Bedok’, ‘Chao Chu Kang’, ‘Jurong West’, ‘Pungol’, ‘Sengkang’, ‘Tampines’, ‘Woodlands’, ‘Yishun’."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#step-1-get-the-data",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#step-1-get-the-data",
+    "title": "Take-Home_Ex01",
+    "section": "Step 1: Get the data",
+    "text": "Step 1: Get the data\nNavigate to https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data and download the csv version of Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2022 from under Population Trends.\nTransfer this csv to appropriate location inside folder where the tableau file will also be stored so that they can be easily accessed."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#step-2-create-new-tableau-book",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#step-2-create-new-tableau-book",
+    "title": "Take-Home_Ex01",
+    "section": "Step 2: Create New tableau Book",
+    "text": "Step 2: Create New tableau Book\nOpen tableau and Click on File > New.\nSave this book to the same location as csv file.\nClick on Connect Data and pick text file.\nA prompt will appear, select the csv file and click open.\n\nNow the data from the csv file is available to be used in this workbook. Some sample fields and data from the csv will also appear after the successful data load.\n\nClick on Sheet 1 to enter Sheet1 where the Age-Sex Pyramid will be created.\nRename Sheet 1 to ‘Age-Sex Pyramid Singapore Planning Area’ for better understanding of the visualisation."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#step-3-create-visualisation",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#step-3-create-visualisation",
+    "title": "Take-Home_Ex01",
+    "section": "Step 3: Create Visualisation",
+    "text": "Step 3: Create Visualisation"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-sum-of-males-and-females",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-sum-of-males-and-females",
+    "title": "Take-Home_Ex01",
+    "section": "1. Create Sum of Males and Females",
+    "text": "1. Create Sum of Males and Females\nCreate Calculated Fields from the left pane as shown:\n\nFor Males,\nIF  [Sex] = \"Females\"\nTHEN [Pop]\nEND\nFor Females, IF  [Sex] = \"Females\"\nTHEN [Pop]\nEND"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-age-group",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-age-group",
+    "title": "Take-Home_Ex01",
+    "section": "2. Create Age Group",
+    "text": "2. Create Age Group\nCreate a age group of 10 years instead of 5 years for better visualisation with following steps.\n\nSelect 2 groups at a time, click on Group and give it a name, e.g. Select 0_to_4 and 5_to_9 and name it 0-9. Rename common field name for this to AgeGroup\n\nCreate initial visualisation\nDrag and drop the Sum of females and males to Columns and AgeGroup to rows\n\nRight click on the X axis where Males is written and click on Edit Axis, there will be option to reverse axis. Check that box and return back.\n\nNow we have a pyramid but they both are in same color."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#change-color-code-for-better-visualisation",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#change-color-code-for-better-visualisation",
+    "title": "Take-Home_Ex01",
+    "section": "3. Change Color Code for better visualisation",
+    "text": "3. Change Color Code for better visualisation\nFrom the options as seen below change the color to get different color for Males and Females"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-row-and-column-axis-for-trellis-display",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-row-and-column-axis-for-trellis-display",
+    "title": "Take-Home_Ex01",
+    "section": "4. Create Row and Column Axis for trellis display",
+    "text": "4. Create Row and Column Axis for trellis display\nCreate a Parameter NumberOfColumns as 3 to get 3 columns. To create a Parameter, we get the option right next to create calculated field. It should look like this:\n\nCreate 3 calculated Fields, similar to as done for Sum of Males and Females.\nFor Column,\nIF [Index] % [NumberOfColumns] = 0\nTHEN [NumberOfColumns]\nELSE [Index] % [NumberOfColumns]\nEND\nFor Row\nINT(([Index]-1)/[NumberOfColumns])\nFor Index\nINDEX()\nSelect both the Rows and Columns and convert it to Discrete\n\nDrag Rows to Rows and Columns to Columns located to top bar to add it on view\nDrag PA to Details in Marks (All) Section.\nCompute Row and Column using PA to get the trellis view."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#filter-planning-area-to-select-9-locations",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#filter-planning-area-to-select-9-locations",
+    "title": "Take-Home_Ex01",
+    "section": "5. Filter Planning Area to select 9 locations",
+    "text": "5. Filter Planning Area to select 9 locations\nDrap PA to filter and select the 9 locations and click OK to filter."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#remove-row-and-column-header-from-visualisation-for-cleanup.",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#remove-row-and-column-header-from-visualisation-for-cleanup.",
+    "title": "Take-Home_Ex01",
+    "section": "6. Remove Row and Column Header from visualisation for cleanup.",
+    "text": "6. Remove Row and Column Header from visualisation for cleanup."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-label-for-each-cell-location-and-add-visualisaion-enhancements",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#create-label-for-each-cell-location-and-add-visualisaion-enhancements",
+    "title": "Take-Home_Ex01",
+    "section": "7. Create Label for each cell Location and add Visualisaion enhancements",
+    "text": "7. Create Label for each cell Location and add Visualisaion enhancements\nCreate another Calculated field called PALabel as\nIF FIRST()=0 THEN WINDOW_MAX(ATTR([PA])) END\nAdd it to SUM(Females) marks.\nAdd Sum(Females) to Sum(Females) marks and Sum(Males) to Sum(Males) marks respectively and adjust the visualisation using the tools inside the Marks until satisfied."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#extract-data-before-uploading-to-tableau-public",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#extract-data-before-uploading-to-tableau-public",
+    "title": "Take-Home_Ex01",
+    "section": "8. Extract data before uploading to Tableau Public",
+    "text": "8. Extract data before uploading to Tableau Public\nOnce ready to upload the visualisation to Tableau Public, extract data as shown. Best practice is to provide location same as other files of the same project."
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#publish-to-tableau-public",
+    "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#publish-to-tableau-public",
+    "title": "Take-Home_Ex01",
+    "section": "10. Publish to Tableau Public",
+    "text": "10. Publish to Tableau Public\nSelect Publish Workbook as shown to publish the visualisation to Tableau Public"
   }
 ]

@@ -1,6 +1,7 @@
 ---
 title: "Hands-on Exercise 1"
 author: "Siddharth Singh"
+date: "`r Sys.Date()`"
 ---
 
 # Getting Started

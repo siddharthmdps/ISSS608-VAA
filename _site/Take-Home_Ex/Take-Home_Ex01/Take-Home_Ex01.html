@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Siddharth Singh">
+<meta name="dcterms.date" content="2023-01-22">
+
+<title>Siddharth Singh (ISSS608: Visual Analytics) - Take-Home_Ex01</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Siddharth Singh (ISSS608: Visual Analytics)</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html">
+ <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-Home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html">
+ <span class="dropdown-text">Take-Home Exercise 1</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+ <span class="menu-text">About</span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-task" id="toc-the-task" class="nav-link active" data-scroll-target="#the-task">The Task</a></li>
+  <li><a href="#procedure" id="toc-procedure" class="nav-link" data-scroll-target="#procedure">Procedure</a>
+  <ul class="collapse">
+  <li><a href="#step-1-get-the-data" id="toc-step-1-get-the-data" class="nav-link" data-scroll-target="#step-1-get-the-data">Step 1: Get the data</a></li>
+  <li><a href="#step-2-create-new-tableau-book" id="toc-step-2-create-new-tableau-book" class="nav-link" data-scroll-target="#step-2-create-new-tableau-book">Step 2: Create New tableau Book</a></li>
+  <li><a href="#step-3-create-visualisation" id="toc-step-3-create-visualisation" class="nav-link" data-scroll-target="#step-3-create-visualisation">Step 3: Create Visualisation</a></li>
+  <li><a href="#create-sum-of-males-and-females" id="toc-create-sum-of-males-and-females" class="nav-link" data-scroll-target="#create-sum-of-males-and-females">1. Create Sum of Males and Females</a></li>
+  <li><a href="#create-age-group" id="toc-create-age-group" class="nav-link" data-scroll-target="#create-age-group">2. Create Age Group</a></li>
+  <li><a href="#change-color-code-for-better-visualisation" id="toc-change-color-code-for-better-visualisation" class="nav-link" data-scroll-target="#change-color-code-for-better-visualisation">3. Change Color Code for better visualisation</a></li>
+  <li><a href="#create-row-and-column-axis-for-trellis-display" id="toc-create-row-and-column-axis-for-trellis-display" class="nav-link" data-scroll-target="#create-row-and-column-axis-for-trellis-display">4. Create Row and Column Axis for trellis display</a></li>
+  <li><a href="#filter-planning-area-to-select-9-locations" id="toc-filter-planning-area-to-select-9-locations" class="nav-link" data-scroll-target="#filter-planning-area-to-select-9-locations">5. Filter Planning Area to select 9 locations</a></li>
+  <li><a href="#remove-row-and-column-header-from-visualisation-for-cleanup." id="toc-remove-row-and-column-header-from-visualisation-for-cleanup." class="nav-link" data-scroll-target="#remove-row-and-column-header-from-visualisation-for-cleanup.">6. Remove Row and Column Header from visualisation for cleanup.</a></li>
+  <li><a href="#create-label-for-each-cell-location-and-add-visualisaion-enhancements" id="toc-create-label-for-each-cell-location-and-add-visualisaion-enhancements" class="nav-link" data-scroll-target="#create-label-for-each-cell-location-and-add-visualisaion-enhancements">7. Create Label for each cell Location and add Visualisaion enhancements</a></li>
+  <li><a href="#extract-data-before-uploading-to-tableau-public" id="toc-extract-data-before-uploading-to-tableau-public" class="nav-link" data-scroll-target="#extract-data-before-uploading-to-tableau-public">8. Extract data before uploading to Tableau Public</a></li>
+  <li><a href="#publish-to-tableau-public" id="toc-publish-to-tableau-public" class="nav-link" data-scroll-target="#publish-to-tableau-public">10. Publish to Tableau Public</a></li>
+  </ul></li>
+  <li><a href="#age-sex-pyramid-visualisation-for-singapore" id="toc-age-sex-pyramid-visualisation-for-singapore" class="nav-link" data-scroll-target="#age-sex-pyramid-visualisation-for-singapore">Age-Sex Pyramid Visualisation for Singapore</a></li>
+  <li><a href="#patterns-revealed" id="toc-patterns-revealed" class="nav-link" data-scroll-target="#patterns-revealed">Patterns Revealed</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Take-Home_Ex01</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Siddharth Singh </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 22, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="the-task" class="level1">
+<h1>The Task</h1>
+<p>The task is to use Age-Sex pyramid to create analytical visualisation to reveal the structure of population by gender and age group.</p>
+<p>The data used in this task is ’<em>Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2022’, which can be found on <a href="https://www.singstat.gov.sg/">Department of Statistics, Singapore</a> website. Navigate to ‘<u>Find Data &gt; Search by Theme &gt; Population &gt; Geographic Distribution &gt; Latest Data</u>’</em> under Population Trends or use the link<a href="https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data" class="uri">https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data</a> to directly go to the page.</p>
+<p>This data is used to find the demographic structure of Singapore at planning level by using age-sex pyramid method in trellis display style. Out of all the available planning level areas in the data set, I have decided to choose these 9 areas for trellis style display - ‘Ang Mo Kio’, ‘Bedok’, ‘Chao Chu Kang’, ‘Jurong West’, ‘Pungol’, ‘Sengkang’, ‘Tampines’, ‘Woodlands’, ‘Yishun’.</p>
+</section>
+<section id="procedure" class="level1">
+<h1>Procedure</h1>
+<section id="step-1-get-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-get-the-data">Step 1: Get the data</h2>
+<p>Navigate to <a href="https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data" class="uri">https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data</a> and download the csv version of <em>Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2022 from under Population Trends.</em></p>
+<p>Transfer this csv to appropriate location inside folder where the tableau file will also be stored so that they can be easily accessed.</p>
+</section>
+<section id="step-2-create-new-tableau-book" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-create-new-tableau-book">Step 2: Create New tableau Book</h2>
+<p>Open tableau and Click on File &gt; New.</p>
+<p>Save this book to the same location as csv file.</p>
+<p>Click on Connect Data and pick text file.</p>
+<p>A prompt will appear, select the csv file and click open.</p>
+<p><img src="images/image-981147527.png" class="img-fluid"></p>
+<p>Now the data from the csv file is available to be used in this workbook. Some sample fields and data from the csv will also appear after the successful data load.</p>
+<p><img src="images/image-1500429907.png" class="img-fluid"></p>
+<p>Click on Sheet 1 to enter Sheet1 where the Age-Sex Pyramid will be created.</p>
+<p>Rename Sheet 1 to <strong>‘Age-Sex Pyramid Singapore Planning Area’</strong> for better understanding of the visualisation.</p>
+</section>
+<section id="step-3-create-visualisation" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-create-visualisation">Step 3: Create Visualisation</h2>
+</section>
+<section id="create-sum-of-males-and-females" class="level2">
+<h2 class="anchored" data-anchor-id="create-sum-of-males-and-females">1. Create Sum of Males and Females</h2>
+<p>Create Calculated Fields from the left pane as shown:</p>
+<p><img src="images/image-1171775641.png" class="img-fluid"></p>
+<p>For Males,</p>
+<p><code>IF  [Sex] = "Females"</code></p>
+<p><code>THEN [Pop]</code></p>
+<p><code>END</code></p>
+<p>For Females, <code>IF  [Sex] = "Females"</code></p>
+<p><code>THEN [Pop]</code></p>
+<p><code>END</code></p>
+</section>
+<section id="create-age-group" class="level2">
+<h2 class="anchored" data-anchor-id="create-age-group">2. Create Age Group</h2>
+<p>Create a age group of 10 years instead of 5 years for better visualisation with following steps.</p>
+<p><img src="images/image-739158107.png" class="img-fluid"></p>
+<p>Select 2 groups at a time, click on Group and give it a name, e.g.&nbsp;Select 0_to_4 and 5_to_9 and name it 0-9. Rename common field name for this to AgeGroup</p>
+<p><img src="images/image-930356987.png" class="img-fluid"></p>
+<p>Create initial visualisation</p>
+<p>Drag and drop the Sum of females and males to Columns and AgeGroup to rows</p>
+<p><img src="images/image-876611478.png" class="img-fluid"></p>
+<p>Right click on the X axis where Males is written and click on Edit Axis, there will be option to reverse axis. Check that box and return back.</p>
+<p><img src="images/image-1502140776.png" class="img-fluid"></p>
+<p>Now we have a pyramid but they both are in same color.</p>
+</section>
+<section id="change-color-code-for-better-visualisation" class="level2">
+<h2 class="anchored" data-anchor-id="change-color-code-for-better-visualisation">3. Change Color Code for better visualisation</h2>
+<p>From the options as seen below change the color to get different color for Males and Females</p>
+<p><img src="images/image-62998492.png" class="img-fluid"></p>
+</section>
+<section id="create-row-and-column-axis-for-trellis-display" class="level2">
+<h2 class="anchored" data-anchor-id="create-row-and-column-axis-for-trellis-display">4. Create Row and Column Axis for trellis display</h2>
+<p>Create a Parameter NumberOfColumns as 3 to get 3 columns. To create a Parameter, we get the option right next to create calculated field. It should look like this:</p>
+<p><img src="images/image-1403296531.png" class="img-fluid"></p>
+<p>Create 3 calculated Fields, similar to as done for Sum of Males and Females.</p>
+<p>For Column,</p>
+<p><code>IF [Index] % [NumberOfColumns] = 0</code></p>
+<p><code>THEN [NumberOfColumns]</code></p>
+<p><code>ELSE [Index] % [NumberOfColumns]</code></p>
+<p><code>END</code></p>
+<p>For Row</p>
+<p><code>INT(([Index]-1)/[NumberOfColumns])</code></p>
+<p>For Index</p>
+<p><code>INDEX()</code></p>
+<p>Select both the Rows and Columns and convert it to Discrete</p>
+<p><img src="images/image-836144841.png" class="img-fluid"></p>
+<p>Drag Rows to Rows and Columns to Columns located to top bar to add it on view</p>
+<p>Drag PA to Details in Marks (All) Section.</p>
+<p>Compute Row and Column using PA to get the trellis view.</p>
+<p><img src="images/image-33201774.png" class="img-fluid"></p>
+</section>
+<section id="filter-planning-area-to-select-9-locations" class="level2">
+<h2 class="anchored" data-anchor-id="filter-planning-area-to-select-9-locations">5. Filter Planning Area to select 9 locations</h2>
+<p>Drap PA to filter and select the 9 locations and click OK to filter.</p>
+<p><img src="images/image-1941062534.png" class="img-fluid"></p>
+</section>
+<section id="remove-row-and-column-header-from-visualisation-for-cleanup." class="level2">
+<h2 class="anchored" data-anchor-id="remove-row-and-column-header-from-visualisation-for-cleanup.">6. Remove Row and Column Header from visualisation for cleanup.</h2>
+<p><img src="images/image-835732102.png" class="img-fluid"></p>
+</section>
+<section id="create-label-for-each-cell-location-and-add-visualisaion-enhancements" class="level2">
+<h2 class="anchored" data-anchor-id="create-label-for-each-cell-location-and-add-visualisaion-enhancements">7. Create Label for each cell Location and add Visualisaion enhancements</h2>
+<p>Create another Calculated field called PALabel as</p>
+<p><code>IF FIRST()=0 THEN WINDOW_MAX(ATTR([PA])) END</code></p>
+<p>Add it to SUM(Females) marks.</p>
+<p>Add Sum(Females) to Sum(Females) marks and Sum(Males) to Sum(Males) marks respectively and adjust the visualisation using the tools inside the Marks until satisfied.</p>
+<p><img src="images/image-1751075411.png" class="img-fluid"></p>
+</section>
+<section id="extract-data-before-uploading-to-tableau-public" class="level2">
+<h2 class="anchored" data-anchor-id="extract-data-before-uploading-to-tableau-public">8. Extract data before uploading to Tableau Public</h2>
+<p>Once ready to upload the visualisation to Tableau Public, extract data as shown. Best practice is to provide location same as other files of the same project.</p>
+<p><img src="images/image-1037206216.png" class="img-fluid"></p>
+</section>
+<section id="publish-to-tableau-public" class="level2">
+<h2 class="anchored" data-anchor-id="publish-to-tableau-public">10. Publish to Tableau Public</h2>
+<p>Select Publish Workbook as shown to publish the visualisation to Tableau Public</p>
+<p><img src="images/image-747973617.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="age-sex-pyramid-visualisation-for-singapore" class="level1">
+<h1>Age-Sex Pyramid Visualisation for Singapore</h1>
+<p>The visualisation can be found here. Please use full screen for clearer image.</p>
+<p><a href="https://public.tableau.com/app/profile/siddharth.singh6175/viz/SiddharthSinghTakeHomeEx01/Age-SexPyramidforSingaporePlanningArea?publish=yes" class="uri">https://public.tableau.com/app/profile/siddharth.singh6175/viz/SiddharthSinghTakeHomeEx01/Age-SexPyramidforSingaporePlanningArea?publish=yes</a></p>
+<p><img src="images/Age-Sex Pyramid Singapore Planning Area.png" class="img-fluid"></p>
+</section>
+<section id="patterns-revealed" class="level1">
+<h1>Patterns Revealed</h1>
+<p>The Age-Sex Pyramid for Singapore Planning Area has a lot of significant patterns which can be analysed. There are multiple things to consider before exploring this pyramid. E.g., the pattern between Males and Females, Pattern between different Age Groups, Pattern in between different Planning Areas.</p>
+<p>Considering all the available data in age-sex pyramid, there are locations with significantly less population compared to other locations. It can mean that location also plays a key role in selecting the place of residence in different age groups and genders.</p>
+<p>In the pyramid, looking closely at the 90 and over age group, there is one significant pattern, there are 2 to 3 times more females than males which can act as a proof to the hypothesis of ‘Females live longer than Males’.</p>
+<p>There are many age groups where there are more females than males, it can be helpful in calculating the sex ratio of the area. Most of the places have similar number of Males and Females, which contributes to good sex ratio of the country population.</p>
+<p>Another pattern that comes out of this pyramid is that there are a lot more people in the age group of 30 and above and a lot less younger people which can be a representation of the aging population.</p>
+<p>These are all the patterns which were found but it is not the end. There can be more. Also, using more data or more fields, it is highly possible to add new layers and see different patterns which can result in more meaningful observations.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
