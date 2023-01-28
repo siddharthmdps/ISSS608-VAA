@@ -110,5 +110,12 @@
     "title": "Take-Home_Ex01",
     "section": "10. Publish to Tableau Public",
     "text": "10. Publish to Tableau Public\nSelect Publish Workbook as shown to publish the visualisation to Tableau Public"
+  },
+  {
+    "objectID": "In-Class_Ex/In-Class_Ex03/In-Class_Ex03.html",
+    "href": "In-Class_Ex/In-Class_Ex03/In-Class_Ex03.html",
+    "title": "In-Class_Ex03",
+    "section": "",
+    "text": "Installing and Loading R packages\nTwo packages will be installed and loaded. Try are tidyverse, ggiraph.\n\npacman::p_load(ggiraph, tidyverse)\n\nImporting data\n\nexam_data <- read_csv(\"../data/Exam_data.csv\")\n\n\nggplot(data=exam_data, aes(x=MATHS)) + geom_dotplot(dotsize=0.5)\n\n\n\n\n\np <- ggplot(data=exam_data, aes(x=MATHS)) + geom_dotplot_interactive(aes(tooltip=ID), stackgroups=TRUE, binwidth=1, method=\"histodot\") + scale_y_continuous(NULL, breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 6,\n  height_svg = 6*0.618\n)"
   }
 ]
