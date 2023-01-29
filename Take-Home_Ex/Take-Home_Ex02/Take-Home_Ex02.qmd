@@ -1,0 +1,162 @@
+---
+title: "Take-Home-Ex02"
+author: "Siddharth Singh"
+date: 28 January 2023
+date-modified: "`r Sys.Date()`"
+execute: 
+  echo: true
+  eval: true
+  warning: false
+format: html
+editor: visual
+---
+
+# The Task
+
+In this task, we have to utilize the visualization done in Take-Home Exercise 1 by our classmate and critique on it in terms of clarity and aesthetics.
+
+We also need to sketch alternative design using best design principles and practices learned in Lessons. For this remake, we will be taking help of R and some packages like ggplot2, tidyverse etc.
+
+# The Data
+
+For this exercise, as we are using the same assets from Take-Home Ex01, hence we will take the same data. It can be found here:
+
+<https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data>
+
+# Original Design
+
+Below is the original design for consideration:
+
+![](Original%20Design%20-%201.png)
+
+![](Original%20Design%20-%202.png)
+
+![](Original%20Design%20-%203.png)
+
+# Design Review
+
+The dashboard is used to provide information about the Singapore Residents by Planning Area, Age Group and Sex.
+
+Data table is given to provide exact number of males/females in a planning area in a age group.
+
+Age-Sex pyramid is used to visualize the data and get meaningful insights.
+
+## Clarity And Aesthetics
+
+### Title and Heading
+
+Title and Heading is clear and concise and represents exactly what it means.
+
+### Axes
+
+Axes are defined properly in both data as well as visualization. But the data-table have age group in x-axis whereas pyramid have age group in y-axis. It can be synchronized to get age group in x-axis in both the sections.
+
+### Legend
+
+For the age-sex pyramid, there is a legend to show "Males" and "Females" colors but it is also displayed on the axis. Legend can be removed to give more space for pyramid which can make it more clear.
+
+### Row and Column Heading
+
+The age-sex pyramid have extra row and column heading which contains serial number. It can be removed as it is not relevant to the visualization.
+
+### Color Selection
+
+Color selection for the Males and Females are a bit off. It can be changed to more brighter color to make it more attractive to eyes.
+
+### Data Table
+
+As a good visualization practice, details should be on-demand. If we hover the age-sex pyramid we can get the exact values, hence the data table can be removed so that pyramids can take whole width and be more clear and easy to read.
+
+# Remake of the Original Design
+
+## Load the required packages
+
+Load the required packages, i.e., "*ggiraph*", "*tidyverse*"
+
+```{r}
+pacman::p_load(ggiraph, tidyverse)
+```
+
+## Load Data
+
+Load the data from the csv file into data variable
+
+```{r}
+data <- read_csv("respopagesextod2022.csv")
+```
+
+## Cleanup and Organise Data
+
+-   Mutate the data to get '*AgeGroup'* where we store age group of 10 years each instead of 5 years.
+
+-   Filter the columns to have PA, AgeGroup, Sex, Pop only as these are the only columns we need.
+
+-   Filter the data set to have only 9 Planning Areas for trellis display.
+
+-   Group the data set in terms of PA, AgeGroup, Sex and summarize the Population by calculating Sum of Pop column
+
+-   As we need the males on left and females on right of pyramid, change all the male population sum to negative value.
+
+-   Arrange the data in terms of descending AgeGroup
+
+```{r}
+data <- data %>%
+  mutate(AgeGroup= ifelse(AG=='0_to_4'|AG=='5_to_9', '0-9', AG)) %>%
+  mutate(AgeGroup= ifelse(AG=='10_to_14'|AG=='15_to_19', '10-19', AgeGroup)) %>%
+  mutate(AgeGroup= ifelse(AG=='20_to_24'|AG=='25_to_29', '20-29', AgeGroup)) %>%
+  mutate(AgeGroup= ifelse(AG=='30_to_34'|AG=='35_to_39', '30-39', AgeGroup)) %>%
+  mutate(AgeGroup= ifelse(AG=='40_to_44'|AG=='45_to_49', '40-49', AgeGroup)) %>%
+  mutate(AgeGroup= ifelse(AG=='50_to_54'|AG=='55_to_59', '50-59', AgeGroup)) %>%
+  mutate(AgeGroup= ifelse(AG=='60_to_64'|AG=='65_to_69', '60-69', AgeGroup)) %>%
+  mutate(AgeGroup= ifelse(AG=='70_to_74'|AG=='75_to_79', '70-79', AgeGroup)) %>%
+  mutate(AgeGroup= ifelse(AG=='80_to_84'|AG=='85_to_89', '80-89', AgeGroup)) %>%
+  select(PA, AgeGroup, Sex, Pop) %>%
+  filter(PA=='Bedok'| PA=='Choa Chu Kang' | PA=='Hougang' | PA=='Jurong West' | PA=='Punggol' | PA=='Sengkang' | PA=='Tampines' | PA=='Woodlands' | PA=='Yishun' ) %>%
+  group_by(PA, AgeGroup, Sex) %>%
+  summarise(Population = sum(Pop)) %>%
+  mutate(Population = ifelse(Sex=='Females', Population, Population*-1)) %>%
+  arrange(desc(AgeGroup))
+
+```
+
+Now the data set looks like this -\>
+
+```{r}
+head(data, 10)
+```
+
+## Plot the data set
+
+Now plot the data using ggplot, we put AgeGroup on y axis, Population on x axis.
+
+-   Use geom_col_interactive to show the pyramid chart with interactivity where we can hover to see the exact values.
+
+-   tooltip and paste to properly structure the data value and display details.
+
+-   scale_fill_manual to change color for Males and Females.
+
+-   scale_x\_continuous to adjust the x axis labels and provide manual details.
+
+-   ggtitle to give title to visualization. facet_wrap to create trellis style model.
+
+-   Add some theme and adjustments to the visualization to make it look clear and concise.
+
+```{r}
+pyramid <- ggplot(data=data, aes(y=AgeGroup, x=Population)) + geom_col_interactive(stat = "identity", aes(fill=Sex, tooltip=paste(
+  paste("Age Group:   ", AgeGroup), 
+  paste("Planning Area:   ", PA), 
+  paste("Sex:   ", Sex), 
+  paste("Population:   ", ifelse(Sex=='Males', Population*-1, Population)), 
+  sep = "\n" 
+  ))) + 
+  scale_fill_manual(values=c("Males" = "#6CA8E8", "Females" = "#F987B1")) + 
+  scale_x_continuous(breaks = c(-20000, -10000, 0, 10000, 20000),
+                     labels = c("20k", "10k \nMale", "0", "10k \nFemale", "20k")) +
+  ggtitle(label = "Singapore Residents by Planning Area, Age Group, Sex June 2022", subtitle = "Top 9 Highest Population By Planning Area, Singapore") + 
+  facet_wrap(~ PA) + theme(legend.position = "none", plot.title = element_text(size=26, face = "bold", hjust = 0.9), plot.subtitle = element_text(size=20, hjust = 0.5))
+girafe(
+  ggobj = pyramid,
+  width_svg = 12,
+  height_svg = 12*0.618
+)
+```
