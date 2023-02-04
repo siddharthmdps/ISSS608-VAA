@@ -166,5 +166,12 @@
     "title": "Take-Home-Ex02",
     "section": "Plot the data set",
     "text": "Plot the data set\nNow plot the data using ggplot, we put AgeGroup on y axis, Population on x axis.\n\nUse geom_col_interactive to show the pyramid chart with interactivity where we can hover to see the exact values.\ntooltip and paste to properly structure the data value and display details.\nscale_fill_manual to change color for Males and Females.\nscale_x_continuous to adjust the x axis labels and provide manual details.\nggtitle to give title to visualization. facet_wrap to create trellis style model.\nAdd some theme and adjustments to the visualization to make it look clear and concise.\n\n\npyramid <- ggplot(data=data, aes(y=AgeGroup, x=Population)) + geom_col_interactive(stat = \"identity\", aes(fill=Sex, tooltip=paste(\n  paste(\"Age Group:   \", AgeGroup), \n  paste(\"Planning Area:   \", PA), \n  paste(\"Sex:   \", Sex), \n  paste(\"Population:   \", ifelse(Sex=='Males', Population*-1, Population)), \n  sep = \"\\n\" \n  ))) + \n  scale_fill_manual(values=c(\"Males\" = \"#6CA8E8\", \"Females\" = \"#F987B1\")) + \n  scale_x_continuous(breaks = c(-20000, -10000, 0, 10000, 20000),\n                     labels = c(\"20k\", \"10k \\nMale\", \"0\", \"10k \\nFemale\", \"20k\")) +\n  ggtitle(label = \"Singapore Residents by Planning Area, Age Group, Sex June 2022\", subtitle = \"Top 9 Highest Population By Planning Area, Singapore\") + \n  facet_wrap(~ PA) + theme(legend.position = \"none\", plot.title = element_text(size=26, face = \"bold\", hjust = 0.9), plot.subtitle = element_text(size=20, hjust = 0.5))\ngirafe(\n  ggobj = pyramid,\n  width_svg = 12,\n  height_svg = 12*0.618\n)"
+  },
+  {
+    "objectID": "In-Class_Ex/In-Class_Ex04/In-Class_Ex04.html",
+    "href": "In-Class_Ex/In-Class_Ex04/In-Class_Ex04.html",
+    "title": "In-Class_Ex04",
+    "section": "",
+    "text": "pacman::p_load(plotly, DT, patchwork, tidyverse)\n\n\nexam_data <- read_csv('../data/Exam_data.csv')\n\n\nplot_ly(data = exam_data, x=~ENGLISH, y = ~MATHS, color = ~RACE) #<<"
   }
 ]
