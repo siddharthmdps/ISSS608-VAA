@@ -1,0 +1,228 @@
+---
+title: "Take-Home_Ex03"
+author: "Siddharth Singh"
+date: 07 February 2023
+date-modified: "`r Sys.Date()`"
+execute: 
+  echo: true
+  eval: true
+  warning: false
+format: html
+editor: visual
+---
+
+# The Task
+
+To uncover the salient patterns of resale prices of public housing property using appropriate analytical visualisation techniques. For this task, the focus is on **3-ROOM, 4-ROOM and 5-ROOM types** in **2022**
+
+# Selection and Design Consideration
+
+Looking at the data overall, the price is provided for different room types. As these room types have different area, price per sq m can have better estimates for trend.
+
+As the market is highly dependent on demand and supply, we need to understand what factors affect the demand and supply. As a person looking for a home, location is very important. It is also important that it accommodates my needs as 3/4/5 rooms, which type will be more suitable. As it is a big investment, it is also highly important to take note of number of years left on the lease.
+
+Considering all the above conditions, we can use many tools such as scatterplot, bar, etc to get meaningful insights. We can also use regression model to improve on our findings.
+
+## Loading Packages needed for this task
+
+```{r}
+pacman::p_load(tidyverse, ggstatsplot, performance, gganimate, gifski, ggridges)
+```
+
+## Loading Data
+
+"*Resale flat princes based on registration date from Jan-2017 onwards*" Data is taken from Data.gov.sg and prepared for visualisation.
+
+```{r}
+originalData <- read_csv('resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv')
+```
+
+Original Data needs to be filtered for 3/4/5 Rooms and month should be from 2022 as required in this task. Remaining Lease is also rounded to year only in numeric for better use. As different rooms have different area, Price per square meter can give better estimates for trends.
+
+```{r}
+data <- originalData %>% filter( flat_type %in% c('3 ROOM', '4 ROOM', '5 ROOM')) %>% filter(substr(month, 0, 4) == '2022' )
+data$remainingLease = as.numeric(substr(data$remaining_lease,0,2))
+data$pricePerSqm = data$resale_price / data$floor_area_sqm
+```
+
+## Datatable to display the final data
+
+Datatable below shows the final mutated, filtered data which will be used later in visualisation.
+
+```{r}
+DT::datatable(data, class="compact")
+```
+
+## One-sample Test: gghistostats() method
+
+One-sample test is done on pricePerSqm
+
+Histogram of dataset
+
+```{r}
+set.seed(1234)
+
+gghistostats(
+  data = data,
+  x = pricePerSqm,
+  type = "bayes",
+  test.value = 5700,
+  xlab = "Resale Price per sq m"
+)
+```
+
+It can be seen that highest proportion of resale price the property around 4.9k per sq meter.
+
+## Two-sample mean test: ggbetweenstats()
+
+Two sample mean test is done on data of flat_type and pricePerSqm
+
+```{r}
+ggbetweenstats(
+  data = data,
+  x = flat_type, 
+  y = pricePerSqm,
+  type = "np",
+  messages = FALSE
+)
+```
+
+There are slight variation in the price per sq m in different flat types. The median of 3 and 4 rooms are higher than 5 room, it can signify that people prefer 3-4 rooms as compared to 5 rooms, as the demand goes up, the price also goes up along with that. It can show that Singapore has more nuclear family where 3-4 rooms are enough for them.
+
+## Oneway ANOVA Test: ggbetweenstats() method
+
+Visual for One-way ANOVA Test on flat_type and pricePerSqm
+
+```{r}
+ggbetweenstats(
+  data = data,
+  x = flat_type, 
+  y = pricePerSqm,
+  type = "p",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+```
+
+It can be seen that 4 Room are the highest priced whereas 5 room have lower price which can means 5 rooms are lower in demand compared to 3-4 rooms. It can be insightful for analysis on Singapore's budget and requirements on housing and
+
+## ggscatterstats()
+
+ggscatterstats is used to see the relation between pricePerSqm and Remaining Lease.
+
+```{r}
+ggscatterstats(
+  data = data,
+  x = remainingLease,
+  y = pricePerSqm,
+  marginal = FALSE,
+  )
+```
+
+It can be seen that prices have significant variation below 40 and more than 85. As prices are much higher when lease is more than 85 years. The price tend to be lower if the lease is less than 40 years left.
+
+## **Significant Test of Association (Depedence) : *ggbarstats()* methods**
+
+Data mutation before ggbarstats() is used.
+
+```{r}
+data1 <- data %>% 
+  mutate(remainingLease_bins = 
+           cut(remainingLease, 
+               breaks = c(0,40, 60,80, 100))
+)
+```
+
+```{r}
+ggbarstats(data1, 
+           x = remainingLease_bins, 
+           y = flat_type)
+```
+
+Remaining Lease is divided into 3 categories (i.e. 40-60, 60-80, 80-100).
+
+3 Room have half of the rooms under 40-60 years lease left, i.e. on the lower end of the remaining lease. whereas 4 and 5 Rooms type have good no of years of years left on lease as only 9-10% only have less than 60 years on lease and majority are in 60-100 years of lease.
+
+## Storey_range in each part of town
+
+```{r}
+ggscatterstats(
+  data = data,
+  x = storey_range,
+  y = town,
+  marginal = FALSE
+) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+It can be seen here that places like Central Area have higher stories compared to Tampines and Serangoon. This can also impact the resale price.
+
+## Proportion of different Room Types in each town area
+
+```{r}
+ggplot(data = data, aes(y = town)) + geom_bar(aes(fill=flat_type))
+```
+
+Different town areas have different proportion of room types. 4 room type is quite common in most of the areas.
+
+## Prices in different areas of town
+
+```{r}
+ggplot(data,
+       aes(x = pricePerSqm, y = town, fill =town)) +
+  geom_density_ridges(alpha = 0.5) + 
+  theme_ridges() + 
+  labs("Price per sq m in different areas of town") + 
+  theme(legend.position = "none") + 
+  labs(x = "Price per sq m", y = "Area") 
+```
+
+## **Multiple Regression Model using lm()**
+
+```{r}
+model <- lm(formula = resale_price ~ town + flat_type + storey_range + flat_model + remainingLease,
+            data = data)
+model
+```
+
+## Model Diagnostic: checking normality assumption
+
+```{r}
+check_c <- check_normality(model)
+```
+
+```{r}
+plot(check_c)
+```
+
+## **Model Diagnostic: Check model for homogeneity of variances**
+
+```{r}
+check_h <- check_heteroscedasticity(model)
+```
+
+```{r}
+plot(check_h)
+```
+
+## **Model Diagnostic: Complete check**
+
+```{r}
+check_model(model)
+```
+
+# Conclusion
+
+In this task, we used analytical tools to visualise and find features in the data provided.
+
+This visualisation can be helpful in finding patterns for people living in Singapore, how much they are spending on Housing. What's the demand and supply situation in the current market. How does different parameters affect the market and resale value.
+
+Our key focus was 3/4/5 room type in the current year. Many factors affected the price such as location, storey range, remaining lease, floor area etc.
+
+We used a lot of different tools to visualise different parameters impact on the price.
+
+One single visualisation cannot give a straight forward result. Using many different tools and techniques providing some part of information, we are able to construct the whole picture by combining them.
+
+Overall, it is seen this task that 4 room have higher price and hence highest in demand. 5 rooms are relatively cheaper but with more area, it can be much expensive and not budget-friendly option. 3 rooms will have less area and hence cheaper option but people tend to go more for 4 room which might suggest that people require more 4 room to accommodate their needs.

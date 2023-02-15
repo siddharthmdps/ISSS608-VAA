@@ -1,0 +1,21 @@
+---
+title: "Testing"
+author: "Siddharth Singh"
+---
+
+```{r}
+pacman::p_load(tidyverse)
+```
+
+```{r}
+Blogs <- read_csv('ZindiNewUserEngagementPredictionChallenge/Blogs.csv')
+Comments <- read_csv('ZindiNewUserEngagementPredictionChallenge/Comments.csv')
+Competition  <- read_csv('ZindiNewUserEngagementPredictionChallenge/Competition.csv')
+CompetitionParticipation <- read_csv('ZindiNewUserEngagementPredictionChallenge/CompetitionPartipation.csv')
+Discussion <- read_csv('ZindiNewUserEngagementPredictionChallenge/Discussion.csv')
+Jobs <- read_csv('ZindiNewUserEngagementPredictionChallenge/Jobs.csv')
+SampleSubmission  <- read_csv('ZindiNewUserEngagementPredictionChallenge/SampleSubmission.csv')
+UserActivity   <- read_csv('ZindiNewUserEngagementPredictionChallenge/UserActivity.csv')
+Users <- read_csv('ZindiNewUserEngagementPredictionChallenge/Users.csv')
+    
+```

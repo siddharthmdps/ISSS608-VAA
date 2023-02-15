@@ -1,0 +1,403 @@
+---
+title: "Hands-on_Ex04"
+author: "Siddharth Singh"
+date: 25 January 2023
+date-modified: "`r Sys.Date()`"
+execute: 
+  echo: true
+  eval: true
+  warning: false
+format: html
+editor: visual
+---
+
+# **Visual Statistical Analysis**
+
+## Load packages
+
+```{r}
+pacman::p_load(
+  ggstatsplot, tidyverse, readxl, performance, parameters, see, #For 4.1
+  plotly, crosstalk, DT, ggdist, gganimate, #For 4.2
+  FunnelPlotR,knitr #For 4.3
+               )
+```
+
+## Load Exam Data
+
+```{r}
+exam <- read_csv('../data/Exam_data.csv')
+```
+
+## On-Sample Test
+
+### gghistostats with bayes on ENGLISH and test value 60
+
+```{r}
+set.seed(1234)
+
+gghistostats(
+  data = exam,
+  x = ENGLISH,
+  type = "bayes",
+  test.value = 60,
+  xlab = "English scores"
+)
+```
+
+## Two-sample mean test
+
+### ggbetweenstats with GENDER AND MATHS and np
+
+```{r}
+ggbetweenstats(
+  data = exam,
+  x = GENDER,
+  y = MATHS,
+  type = "np",
+  message = FALSE
+)
+```
+
+## Oneway ANOVA Test
+
+### ggbetweenstats method on RACE and ENGLISH
+
+```{r}
+ggbetweenstats(
+  data = exam,
+  x = RACE,
+  y = ENGLISH,
+  type = 'p',
+  mean.ci = TRUE,
+  pairwise_comparisons = TRUE,
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+```
+
+## Significant Test of Correlation
+
+### ggscatterstats method on MATHS and ENGLISH
+
+```{r}
+ggscatterstats(
+  data = exam,
+  x = MATHS,
+  y = ENGLISH,
+  marginal = FALSE
+)
+```
+
+## Significant Test of Association (Dependence)
+
+Loading data with mutation
+
+```{r}
+exam1 <- exam %>%
+  mutate(MATHS_bins = cut(MATHS, breaks = c(0, 60, 75, 85, 100)))
+```
+
+### ggbarstats
+
+```{r}
+ggbarstats(exam1, x = MATHS_bins, y = GENDER)
+```
+
+## Visualising Models
+
+Loading car_resale data
+
+```{r}
+car_resale <- read_xls("../data/ToyotaCorolla.xls", "data")
+car_resale
+```
+
+### Multiple Regression Model using lm
+
+```{r}
+model <- lm(Price ~ Age_08_04 + Mfg_Year + KM + Weight + Guarantee_Period, data = car_resale)
+model
+```
+
+### Model Diagnostic: checking for multicolonearity
+
+```{r}
+check_c <- check_collinearity(model)
+plot(check_c)
+```
+
+### Model Diagnostic: checking for normality assumption
+
+```{r}
+model1 <- lm(Price ~ Age_08_04 + KM + Weight + Guarantee_Period, data = car_resale)
+check_n <- check_normality(model1)
+plot(check_n)
+```
+
+### **Model Diagnostic: Check model for homogeneity of variances**
+
+```{r}
+check_h <- check_heteroscedasticity(model1)
+plot(check_h)
+```
+
+### **Model Diagnostic: Complete check**
+
+```{r}
+check_model(model1)
+```
+
+### **Visualising Regression Parameters using see methods**
+
+```{r}
+plot(parameters(model1))
+```
+
+### **Visualising Regression Parameters using *ggcoefstats***
+
+```{r}
+ggcoefstats(model1, output="plot")
+```
+
+# Visualising Uncertainty
+
+```{r}
+my_sum <- exam %>%
+  group_by(RACE) %>%
+  summarise(
+    n=n(),
+    mean = mean(MATHS),
+    sd = sd(MATHS)
+  ) %>%
+  mutate(se = sd/sqrt(n-1))
+
+```
+
+```{r}
+knitr::kable(head(my_sum), format = 'html')
+```
+
+```{r}
+ggplot(my_sum) + geom_errorbar(
+  aes(x = RACE, ymin = n-mean, ymax = n+mean),
+  width = 0.2,
+  colour = "black",
+  alpha = 0.9,
+  size = 0.35
+) + 
+  geom_point(aes(x=RACE, y=mean), stat="identity", color="red", size=1.5, alpha=1) + 
+  ggtitle("Standard error of mean maths score by race")
+```
+
+```{r}
+ggplot(my_sum) + geom_errorbar(
+  aes(x = reorder(RACE, -mean), ymin = mean-1.96*(sd/sqrt(n)), ymax = mean+1.96*(sd/sqrt(n))),
+  width = 0.2,
+  colour = "black",
+  alpha = 0.9,
+  size = 0.35
+) + 
+  geom_point(aes(x=RACE, y=mean), stat="identity", color="red", size=1.5, alpha=1) + 
+  ggtitle("95% confidence interval of mean maths score by race")
+
+```
+
+```{r}
+d <- highlight_key(my_sum)
+p <- ggplot(d) + geom_errorbar(
+  aes(x = reorder(RACE, -mean), ymin = mean-2.58*(sd/sqrt(n)), ymax = mean+2.58*(sd/sqrt(n))),
+  width = 0.2,
+  colour = "black",
+  alpha = 0.9,
+  size = 0.35
+) + 
+  geom_point(aes(x=RACE, y=mean), stat="identity", color="red", size=1.5, alpha=1) + 
+  ggtitle("99% confidence interval of mean maths score by race")
+
+gg <- highlight(ggplotly(p), "plotly_selected")
+
+crosstalk::bscols(gg, DT::datatable(d), widths = 5)
+```
+
+```{r}
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) + 
+  stat_pointinterval(.width = 0.95, .point=median, .interval=qi) + 
+  labs(
+    title = "Visualising confidence intervals of mean math score",
+    subtitle = "Mean Point + Multiple-interval plot"
+  )
+```
+
+```{r}
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) + 
+  stat_pointinterval(show.legend = FALSE) + 
+  labs(
+    title = "Visualising confidence intervals of mean math score",
+    subtitle = "Mean Point + Multiple-interval plot"
+  )
+```
+
+```{r}
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) +
+  stat_gradientinterval(fill = "skyblue", show.legend = TRUE) +
+  labs(
+    title = "Visualising confidence intervals of mean math score",
+    subtitle = "Gradient + interval plot"
+  )
+```
+
+```{r}
+devtools::install_github("wilkelab/ungeviz")
+```
+
+```{r}
+library(ungeviz)
+```
+
+```{r}
+ggplot(data = exam, aes(x = factor(RACE), y = MATHS)) +
+  geom_point(position = position_jitter(
+    height = 0.3, width = 0.05
+  ),
+  size = 0.4, color = '#0072B2', alpha = 1/2) + 
+  geom_hpline(data = sampler(25, group = RACE), height = 0.6, color = "#D55E00") + 
+  theme_bw() + transition_states(.draw, 1,3)
+```
+
+```{r}
+ggplot(data = exam, 
+       (aes(x = factor(RACE), 
+            y = MATHS))) +
+  geom_point(position = position_jitter(
+    height = 0.3, 
+    width = 0.05), 
+    size = 0.4, 
+    color = "#0072B2", 
+    alpha = 1/2) +
+  geom_hpline(data = sampler(25, 
+                             group = RACE), 
+              height = 0.6, 
+              color = "#D55E00") +
+  theme_bw() + 
+  transition_states(.draw, 1, 3)
+```
+
+Building Funnel Plot with R
+
+```{r}
+covid19 <- read_csv("../data/COVID-19_DKI_Jakarta.csv") %>%
+  mutate_if(is.character, as.factor)
+```
+
+```{r}
+funnel_plot(
+  numerator = covid19$Positive,
+  denominator = covid19$Death,
+  group = covid19$'Sub-district'
+)
+```
+
+```{r}
+funnel_plot(
+  numerator = covid19$Death,
+  denominator = covid19$Positive,
+  group = covid19$`Sub-district`,
+  data_type = "PR",
+  xrange = c(0,6500),
+  yrange = c(0,0.05)
+)
+```
+
+```{r}
+funnel_plot(
+  numerator = covid19$Death,
+  denominator = covid19$Positive,
+  group = covid19$`Sub-district`,
+  data_type = "PR",   
+  xrange = c(0, 6500),  
+  yrange = c(0, 0.05),
+  label = NA,
+  title = "Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases", #<<           
+  x_label = "Cumulative COVID-19 Positive Cases", #<<
+  y_label = "Cumulative Fatality Rate"  #<<
+)
+```
+
+```{r}
+df <- covid19 %>%
+  mutate(rate = Death / Positive) %>%
+  mutate(rate.se = sqrt((rate*(1-rate)) / (Positive))) %>%
+  filter(rate > 0)
+```
+
+```{r}
+fit.mean <- weighted.mean(df$rate, 1/df$rate.se^2)
+```
+
+```{r}
+number.seq <- seq(1, max(df$Positive), 1)
+number.ll95 <- fit.mean - 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+number.ul95 <- fit.mean + 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+number.ll999 <- fit.mean - 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+number.ul999 <- fit.mean + 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+dfCI <- data.frame(number.ll95, number.ul95, number.ll999, number.ul999, number.seq, fit.mean)
+```
+
+```{r}
+p <- ggplot(df, aes(x = Positive, y = rate)) +
+  geom_point(aes(label=`Sub-district`), 
+             alpha=0.4) +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ll95), 
+            size = 0.4, 
+            colour = "grey40", 
+            linetype = "dashed") +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ul95), 
+            size = 0.4, 
+            colour = "grey40", 
+            linetype = "dashed") +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ll999), 
+            size = 0.4, 
+            colour = "grey40") +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ul999), 
+            size = 0.4, 
+            colour = "grey40") +
+  geom_hline(data = dfCI, 
+             aes(yintercept = fit.mean), 
+             size = 0.4, 
+             colour = "grey40") +
+  coord_cartesian(ylim=c(0,0.05)) +
+  annotate("text", x = 1, y = -0.13, label = "95%", size = 3, colour = "grey40") + 
+  annotate("text", x = 4.5, y = -0.18, label = "99%", size = 3, colour = "grey40") + 
+  ggtitle("Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases") +
+  xlab("Cumulative Number of COVID-19 Cases") + 
+  ylab("Cumulative Fatality Rate") +
+  theme_light() +
+  theme(plot.title = element_text(size=12),
+        legend.position = c(0.91,0.85), 
+        legend.title = element_text(size=7),
+        legend.text = element_text(size=7),
+        legend.background = element_rect(colour = "grey60", linetype = "dotted"),
+        legend.key.height = unit(0.3, "cm"))
+p
+```
+
+```{r}
+fp_ggplotly <- ggplotly(p,
+  tooltip = c("label", 
+              "x", 
+              "y"))
+fp_ggplotly
+```
