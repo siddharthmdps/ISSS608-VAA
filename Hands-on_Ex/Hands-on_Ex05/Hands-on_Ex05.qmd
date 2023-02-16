@@ -20,6 +20,16 @@ wine <- read_csv("data/wine_quality.csv")
 ```
 
 ```{r}
+pairs(wine[,1:11])
+```
+```{r}
+pairs(wine[,2:12], upper.panel = NULL)
+```
+```{r}
+pairs(wine[,2:12], lower.panel = NULL)
+```
+
+```{r}
 ggstatsplot::ggcorrmat(
   data = wine, 
   cor.vars = 1:11)
