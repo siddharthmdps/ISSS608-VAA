@@ -23,6 +23,8 @@ website:
           href: "Take-Home_Ex/Take-Home_Ex02/Take-Home_Ex02.qmd"
         - text: "Take-Home Exercise 3"
           href: "Take-Home_Ex/Take-Home_Ex03/Take-Home_Ex03.qmd"
+        - text: "Take-Home Exercise 4"
+          href: "Take-Home_Ex/Take-Home_Ex04/Take-Home_Ex04.qmd"
     - text: "In-Class Exercise"
       menu:
         - text: "In-Class Exercise 3"

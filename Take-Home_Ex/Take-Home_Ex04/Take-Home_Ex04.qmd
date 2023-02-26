@@ -1,0 +1,44 @@
+---
+title: "Take-Home_Ex04"
+author: "Siddharth Singh"
+date: 19 February 2023
+date-modified: "`r Sys.Date()`"
+execute: 
+  echo: true
+  eval: true
+  warning: false
+format: html
+editor: visual
+---
+
+```{r}
+pacman::p_load(scales, viridis, lubridate, ggthemes, gridExtra, tidyverse, readxl, knitr, data.table)
+```
+
+```{r}
+importData <- read_xlsx("./data.xlsx", "Import", range = "A1:AL120")
+exportData <- read_xlsx("./data.xlsx", "Export", range = "A1:AL92")
+```
+
+```{r}
+importData <- importData %>%
+  pivot_longer(cols = 2:38, names_to = "month-year", values_to = "Imports" ) %>%
+  pivot_wider(names_from = 'Data Series', values_from = "Imports")
+
+exportData <- exportData %>%
+  pivot_longer(cols = 2:38, names_to = "month-year", values_to = "Exports" ) %>%
+  pivot_wider(names_from = 'Data Series', values_from = "Exports")
+
+```
+
+```{r}
+```
+
+```{r}
+kable(head(importData))
+
+```
+
+```{r}
+kable(head(exportData))
+```

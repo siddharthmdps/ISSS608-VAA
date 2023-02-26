@@ -1,0 +1,23 @@
+---
+title: "Hands-on_Ex07"
+author: "Siddharth Singh"
+date: 25 February 2023
+date-modified: "`r Sys.Date()`"
+execute: 
+  echo: true
+  eval: true
+  warning: false
+format: html
+editor: visual
+---
+
+Choropleth Mapping with R
+
+```{r}
+pacman::p_load(sf, tmap, tidyverse)
+```
+
+```{r}
+mpsz <- st_read(dsn = "../data/geospatial", layer = "../data/geospatial/MP14_SUBZONE_WEB_PL")
+
+```
