@@ -18,6 +18,6 @@ pacman::p_load(sf, tmap, tidyverse)
 ```
 
 ```{r}
-mpsz <- st_read(dsn = "../data/geospatial", layer = "../data/geospatial/MP14_SUBZONE_WEB_PL")
+#mpsz <- st_read(dsn = "../data/geospatial", layer = "../data/geospatial/MP14_SUBZONE_WEB_PL")
 
 ```

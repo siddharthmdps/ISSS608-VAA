@@ -11,34 +11,684 @@ format: html
 editor: visual
 ---
 
+# **The Task**
+
+To uncover the impact of COVID-19 and global economic and political dynamic in 2022 on Singapore bilateral trade.
+
+# **Selection and Design Consideration**
+
+Looking at the data overall, there is Total Merchandise Import and Export field which can be helpful to gather information about the overall impact of COVID-19 and other influential events that happened over the course of time.
+
+For this Take home exercise, the study period selected is from January 2020 till December 2022 and during this period of time, different countries have different import/export relationship with Singapore, we can use visualisation like slopegraph to compare bilateral trade between different countries.
+
+With our findings from slopegraph we can pick top countries to visualise cycle plot to see different patterns over the period of time to have clearer picture and gain some insights.
+
+# **Loading Packages needed for this task**
+
 ```{r}
-pacman::p_load(scales, viridis, lubridate, ggthemes, gridExtra, tidyverse, readxl, knitr, data.table)
+pacman::p_load(scales, viridis, lubridate, ggthemes, gridExtra, tidyverse, readxl, knitr, data.table, CGPfunctions, ggplot2, plotly, ggHoriPlot)
 ```
+
+## Loading and Cleaning Data
+
+*"Merchandise Trade provided by Department of Statistics, Singapore (DOS)"* is taken from Department of Statistics website and prepared for visualisation.
+
+### Data Cleanup steps
+
+-   Data is imported to variables.
+
+-   Pivot to rearrange as per needs.
+
+-   Rename columns for ease of use in later stage.
+
+-   All data is converted to be in Millions.
+
+-   Renaming Country values to remove units like Thousand Dollars/Million dollars.
+
+-   Mutate to add year/month seperate from year-month format.
+
+-   Filter data to contain only 2020-2022 values.
+
+### For Slopegraph
+
+```{r}
+importDataSlope <- read_xlsx("./data.xlsx", "Import", range = "A1:AL120")
+exportDataSlope <- read_xlsx("./data.xlsx", "Export", range = "A1:AL92")
+
+importDataSlope <- importDataSlope %>%
+  pivot_longer(cols = 2:38, names_to = "yearmonth", values_to = "Imports" )
+
+exportDataSlope <- exportDataSlope %>%
+  pivot_longer(cols = 2:38, names_to = "yearmonth", values_to = "Exports" )
+
+colnames(importDataSlope) <- c("Country", "yearmonth", "Imports")
+colnames(exportDataSlope) <- c("Country", "yearmonth", "Exports")
+
+importDataSlope$Imports <- ifelse(grepl("(Thousand Dollars)", importDataSlope$Country, fixed = TRUE), importDataSlope$Imports/1000, importDataSlope$Imports)
+exportDataSlope$Exports <- ifelse(grepl("(Thousand Dollars)", exportDataSlope$Country, fixed = TRUE), exportDataSlope$Exports/1000, exportDataSlope$Exports)
+
+importDataSlope$Country<-gsub(" [(]Thousand Dollars[)]","",as.character(importDataSlope$Country))
+exportDataSlope$Country<-gsub(" [(]Thousand Dollars[)]","",as.character(exportDataSlope$Country))
+importDataSlope$Country<-gsub(" [(]Million Dollars[)]","",as.character(importDataSlope$Country))
+exportDataSlope$Country<-gsub(" [(]Million Dollars[)]","",as.character(exportDataSlope$Country))
+```
+
+### For cycleplot
 
 ```{r}
 importData <- read_xlsx("./data.xlsx", "Import", range = "A1:AL120")
 exportData <- read_xlsx("./data.xlsx", "Export", range = "A1:AL92")
-```
 
-```{r}
 importData <- importData %>%
-  pivot_longer(cols = 2:38, names_to = "month-year", values_to = "Imports" ) %>%
-  pivot_wider(names_from = 'Data Series', values_from = "Imports")
+  pivot_longer(cols = 2:38, names_to = "year-month", values_to = "Imports" ) %>%
+  pivot_wider(names_from = 'Data Series', values_from = "Imports") %>%
+  mutate_at(vars(contains('Thousand Dollars')), ~ (. /1000))
 
 exportData <- exportData %>%
-  pivot_longer(cols = 2:38, names_to = "month-year", values_to = "Exports" ) %>%
-  pivot_wider(names_from = 'Data Series', values_from = "Exports")
+  pivot_longer(cols = 2:38, names_to = "year-month", values_to = "Exports" ) %>%
+  pivot_wider(names_from = 'Data Series', values_from = "Exports") %>%
+  mutate_at(vars(contains('Thousand Dollars')), ~ (. /1000))
 
+colnames(importData) <- gsub(" (Thousand Dollars)", "", colnames(importData), fixed = TRUE)
+colnames(importData) <- gsub(" (Million Dollars)", "", colnames(importData), fixed = TRUE)
+
+colnames(exportData) <- gsub(" (Thousand Dollars)", "", colnames(exportData), fixed = TRUE)
+colnames(exportData) <- gsub(" (Million Dollars)", "", colnames(exportData), fixed = TRUE)
+
+importData <- importData %>% 
+  mutate('date' = ym(importData$'year-month'))
+
+exportData <- exportData %>% 
+  mutate('date' = ym(exportData$'year-month'))
+
+importData$month <- factor(month(importData$`date`), 
+                    levels=1:12, 
+                    labels=month.abb, 
+                    ordered=TRUE) 
+importData$year <- year(ym(importData$`year-month`))
+
+exportData$month <- factor(month(exportData$`date`), 
+                    levels=1:12, 
+                    labels=month.abb, 
+                    ordered=TRUE) 
+exportData$year <- year(ym(exportData$`year-month`))
+
+exportData <- exportData %>% filter(year %in% c(2020, 2021, 2022))
+importData <- importData %>% filter(year %in% c(2020, 2021, 2022))
 ```
 
-```{r}
-```
+## Data after cleanup
+
+::: panel-tabset
+## Import Data for Slopegraph
 
 ```{r}
+kable(head(importDataSlope))
+```
+
+## Export Data for Slopegraph
+
+```{r}
+kable(head(exportDataSlope))
+```
+
+## Import Data for Cycleplot
+
+```{r}
+
 kable(head(importData))
-
 ```
+
+## Export Data for Cycleplot
 
 ```{r}
 kable(head(exportData))
 ```
+:::
+
+# Bilateral Trade over the time
+
+```{r}
+importDataLine <- importDataSlope %>% filter(Country=="Total Merchandise Imports")
+exportDataLine <- exportDataSlope %>% filter(Country=="Total Merchandise Exports")
+ggplot() + 
+  geom_line(data = importDataLine, aes(x=ym(yearmonth), y=Imports), color="red") + 
+  geom_line(data = exportDataLine, aes(x=ym(yearmonth), y=Exports), color="green") + 
+  labs(x = "Year", y = "Trade (In Millions)") + 
+  scale_x_continuous(breaks = seq(ym("2020 Jan"), ym("2022 Dec"), by = 92)) +
+  theme(axis.text.x = element_text(angle = 45)) +
+  geom_vline(xintercept = ym("2022 Feb"), linetype=6, colour="blue", size=0.5) + 
+  geom_text(aes(ym("2022 Feb"),40000,label = "Russia-Ukraine War")) +
+  geom_vline(xintercept = ym("2020 Feb"), linetype=6, colour="blue", size=0.5) + 
+  geom_text(aes(ym("2020 Apr"),40000,label = "COVID-19"))
+```
+
+Two of the major events that happened around the world in 2020-2022 is COVID and Russia-Ukraine War. We can see sharp decline in trade during these events.
+
+## Top Trading Countries during the time
+
+::: panel-tabset
+# Import
+
+```{r echo=FALSE}
+importDataSlope %>% 
+  filter(yearmonth %in% c("2020 Jan", "2021 Jan", "2022 Dec")) %>%
+  filter(!Country %in% c("Total Merchandise Imports", "Asia", "North America", "South America", "Africa", "Antarctica", "Europe", "Oceania")) %>%
+  newggslopegraph(yearmonth, Imports, Country,
+                Title = "Imports by Singapore (in Million Dollars)",
+                SubTitle = "2020-2023",
+                Caption = "Imports as per data")
+```
+
+2021 has seen a flat or downward trends in import but 2022 has significant increase in the imports among the countries from where Singapore majorly imports. It can be due to multiple reasons.
+
+There is an increase in imports overall from major trading countries but the patterns have changed. America was dominating the import trends in 2020 but in 2021 Mainland China is now the major import partner.
+
+# Export
+
+```{r echo=FALSE}
+exportDataSlope %>% 
+  filter(yearmonth %in% c("2020 Jan", "2021 Jan", "2022 Dec")) %>%
+  filter(!Country %in% c("Total Merchandise Exports", "Asia", "North America", "South America", "Africa", "Antarctica", "Europe", "Oceania")) %>%
+  newggslopegraph(yearmonth, Exports, Country,
+                Title = "Exports from Singapore (in Million Dollars)",
+                SubTitle = "2020-2023",
+                Caption = "Exports as per data")
+```
+
+There is a mix of upward and downward and flat trend in 2021 but 2022 has seen major increase in exports where export to Hong Kong is significantly higher among the countries to where Singapore majorly export. Many factors may have contributed to this effect.
+:::
+
+# Major Countries bilateral trade with Singapore
+
+::: panel-tabset
+#### Mainland China
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`Mainland China`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`Mainland China`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Mainland China`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Mainland China`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`Mainland China`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`Mainland China`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with Mainland China 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Exports in Q4 2022 have declined. Imports have increased.
+
+#### Malaysia
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`Malaysia`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`Malaysia`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Malaysia`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Malaysia`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`Malaysia`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`Malaysia`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with Malaysia 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Both import have export have increased with time. Always higher import than export.
+
+#### Hong Kong
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`Hong Kong`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`Hong Kong`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Hong Kong`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Hong Kong`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`Hong Kong`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`Hong Kong`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with Hong Kong 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Export is significantly higher than import. Q4 of 2022 have decline in exports.
+
+#### India
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`India`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`India`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`India`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`India`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`India`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`India`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with India 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Export is higher than import. Q4 have mostly seen decline in 2022.
+
+#### Japan
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`Japan`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`Japan`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Japan`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Japan`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`Japan`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`Japan`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with Japan 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Import and export are quite comparable. Q2 has seen sharp increase in imports.
+
+#### Taiwan
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`Taiwan`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`Taiwan`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Taiwan`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Taiwan`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`Taiwan`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`Taiwan`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with Taiwan 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Imports are much higher than exports. Q4 2022 have mostly seen decline. Imports have increased more than exports.
+
+#### Republic Of Korea
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`Republic Of Korea`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`Republic Of Korea`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Republic Of Korea`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Republic Of Korea`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`Republic Of Korea`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`Republic Of Korea`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with Republic Of Korea 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Imports have significantly increased whereas exports not so much.
+
+#### Indonesia
+
+```{r echo=FALSE}
+importCycle <- importData %>% 
+  select(`Indonesia`, 
+         month, 
+         year)
+
+exportCycle<- exportData %>% 
+  select(`Indonesia`, 
+         month, 
+         year)
+
+hline1.data <- importCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Indonesia`))
+
+hline2.data <- exportCycle %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Indonesia`))
+
+ggplot() + 
+  geom_line(data=importCycle,
+            aes(x=as.character(year), 
+                y=`Indonesia`, 
+                group=month, 
+            colour="import")) +
+  geom_line(data=exportCycle,
+            aes(x=as.character(year), 
+                y=`Indonesia`, 
+                group=month, 
+            colour="export")) +
+  geom_hline(aes(yintercept=avgvalue, colour="import"), 
+             data=hline1.data, 
+             linetype=6,
+             size=0.5) + 
+  geom_hline(aes(yintercept=avgvalue, colour="export"), 
+             data=hline2.data, 
+             linetype=6, 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Trade with Indonesia 2020-2022") +
+  scale_colour_manual("", 
+                      values = c("import"="red", "export"="green")) +
+  xlab("Years") +
+  ylab("Trade (in million dollars)") +
+  theme(axis.text.x = element_text(angle = 90))
+
+
+```
+
+::: panel-tabset
+Exports have significantly increased whereas imports not so much.
+:::
+:::
+
+Different countries have trade relations with Singapore. Some countries have higher imports, others have higher export.
+
+# Horizon Graph to visualize Average Bilateral Trade
+
+::: panel-tabset
+## Average Import by Singapore
+
+```{r echo=FALSE}
+importDataSlope %>%
+  filter(year(ym(yearmonth)) %in% c(2022, 2021, 2020)) %>%
+  ggplot() +
+  geom_horizon(aes(x = as.Date(ym(yearmonth)), y=Imports), 
+               origin = "midpoint", 
+               horizonscale = 6)+
+  facet_grid(`Country`~.) +
+    theme_few() +
+  scale_fill_hcl(palette = 'RdBu') +
+  theme(panel.spacing.y=unit(0, "lines"), strip.text.y = element_text(
+    size = 5, angle = 0, hjust = 0),
+    legend.position = 'none',
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size=7),
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.border = element_blank()
+    ) +
+    scale_x_date(expand=c(0,0), date_breaks = "3 month", date_labels = "%b%y") +
+  ggtitle('Average Imports in Singapore (Jan 2020 to Dec 2022)')
+```
+
+## Average Export from Singapore
+
+```{r echo=FALSE}
+exportDataSlope %>%
+  filter(year(ym(yearmonth)) %in% c(2022, 2021, 2020)) %>%
+  ggplot() +
+  geom_horizon(aes(x = as.Date(ym(yearmonth)), y=Exports), 
+               origin = "midpoint", 
+               horizonscale = 6)+
+  facet_grid(`Country`~.) +
+    theme_few() +
+  scale_fill_hcl(palette = 'RdBu') +
+  theme(panel.spacing.y=unit(0, "lines"), strip.text.y = element_text(
+    size = 5, angle = 0, hjust = 0),
+    legend.position = 'none',
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size=7),
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.border = element_blank()
+    ) +
+    scale_x_date(expand=c(0,0), date_breaks = "3 month", date_labels = "%b%y") +
+  ggtitle('Average Exports from Singapore (Jan 2020 to Dec 2022)')
+```
+:::
+
+# Conclusion
+
+In this task, we used analytical tools like cycleplot, horizon graph, slopegraph to visualise and find features in the data provided.
+
+This visualisation can be helpful in finding patterns in bilateral trade of different country with Singapore. How different events across the world has impacted the trade and economy in Singaproe.
+
+Our key focus for this task is Jan 2020-Dec 2022. Many events like COVID, Russia-Ukraine war etc. can be the contributing factors in the trade fluctuation.
+
+One single visualisation cannot give a straight forward result. Using many different tools and techniques providing some part of information, we are able to construct the whole picture by combining them.
+
+Overall, it is seen in this task that COVID and border measures have impacted the trade and there was very minimal increase or decline in trade. Russia Ukraine war also had impacts on trade. It is different for different countries.
